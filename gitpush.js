@@ -6,7 +6,7 @@ const { resolve } = require('path');
 
 let projectsDir = './code-arcade/';
 
-const s = simpleGit()
+
 
 
 // loops through file directory and outputs all paths of dirs
@@ -67,10 +67,16 @@ async function gitPushHandler(finalArr) {
 // Function to handle pushing to git with a given 'older' date
 let longMan = 40;
   function gitPush(folder) {
+  
+    let commit = new simpleGit()
 
   let date = moment().subtract(longMan, 'd').format();
 
-   s.add([folder]).commit(folder, { '--date': date }).push()
+    console.log(folder)
+  commit.add(folder)
+   .commit(folder, {'--date--': date}, () => console.log('commit done')).push();
+
+
 
   longMan -= 1;
 }
