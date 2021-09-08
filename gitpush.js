@@ -2,9 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const simpleGit = require('simple-git');
+const { resolve } = require('path');
 
-let projectsDir = './out/arcade/code-arcade';
+let projectsDir = './code-arcade/';
 
+const s = simpleGit()
+
+
+// loops through file directory and outputs all paths of dirs
 function getFileSync(dir, files = []) {
   const listing = fs.readdirSync(dir, { withFileTypes: true });
   let dirs = [];
@@ -25,6 +30,8 @@ function getFileSync(dir, files = []) {
 
 let files = getFileSync(projectsDir);
 
+
+
 // gets sub directories of parent folder
 let pathArr = [];
 files.forEach((file) => {
@@ -32,67 +39,41 @@ files.forEach((file) => {
   pathArr.push(yeet);
 });
 
-for (let i = 0; i< pathArr.length, i ++;) {
-  for (let j = 0; j < pathArr[i].length, j ++;){
-    console.log(pathArr[j])
-    // gitPush(pathArr[i][j])
-  }
+
+let finalArr = pathArr.flat()
+let count = 0
+
+// Attempted to write this function to ensure each Git push would complete before the next loop, but I think this is unrelated to the problem 
+async function gitPushHandler(finalArr) {
+  await new Promise((resolve) => {
+    finalArr.forEach((i) => {
+      try {
+        gitPush(i)
+      } catch(e) {
+        console.log(e)
+      } finally {
+        count += 1
+        if (count == finalArr.length) {
+          resolve()
+        }
+      }
+    })
+  })
 }
 
-pathArr.every((subPath) => {
-  // longMan +=  subPath.length
 
 
-  // subPath.every((folder) => {
-  //   gitPush(folder)
 
-  // });
-});
-
- function gitPush(folder) {
-  let longMan = 40;
+// Function to handle pushing to git with a given 'older' date
+let longMan = 40;
+  function gitPush(folder) {
 
   let date = moment().subtract(longMan, 'd').format();
 
-   simpleGit().add([folder]).commit(folder, { '--date': date }).push();
+   s.add([folder]).commit(folder, { '--date': date }).push()
+
   longMan -= 1;
 }
-// function GetFinalPaths(projectsDir) {
-//   fs.readdirSync(projectsDir, function (err, files) {
-//     if (err) {
-//       console.error('could not list dir', err);
-//     }
 
-//     subby = [];
-//     files.forEach((file) => {
-//       subby.push(projectsDir + '/' + file);
-//     });
 
-//     subby.forEach((question) => {
-//       fs.readdirSync(question, function (err, i) {
-//         if (err) {
-//           console.error('could not list dir', err);
-//         }
-
-//         pathArr = [];
-//         i.forEach((path) => {
-//           pathArr.push(question + '/' + path);
-//         });
-//         console.log(pathArr);
-//         return pathArr;
-//       });
-//     });
-//   });
-// }
-
-// console.log(GetFinalPaths(projectsDir));
-
-// console.log(paths);
-
-// counter = 30;
-
-// function pushCode(path) {
-//  ();
-
-//   counter -= 1;
-// }
+gitPushHandler(finalArr)
